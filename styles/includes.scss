@@ -1,0 +1,6 @@
+// setup Bootstrap and fonts path
+$icon-font-path: "~/../node_modules/bootstrap-sass/assets/fonts/bootstrap/";
+@import "/../node_modules/bootstrap-sass/assets/stylesheets/_bootstrap.scss";
+
+$fa-font-path: "~/../node_modules/font-awesome/fonts";
+@import "/../node_modules/font-awesome/scss/font-awesome.scss";
