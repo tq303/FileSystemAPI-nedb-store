@@ -4,7 +4,7 @@
 
 class FileAPI {
 
-    constructor( fileName = "db", fileType = "text/plain", size = ( 1024*1024 ) ) {
+    constructor( fileName = "db", size = ( 1024*1024 ), fileType = "text/plain" ) {
 
         this.fs       = null;
         this.size     = size;

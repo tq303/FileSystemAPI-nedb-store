@@ -8,7 +8,7 @@ class ClientDB {
 
         this.msg          = this.msg();
         this.store        = null;
-        this.jsonFile     = new FileAPI( databaseName );
+        this.jsonFile     = new FileAPI( databaseName, (10*1024*1024) );
         this.hasLoaded    = false;
         this.databaseName = databaseName;
 
