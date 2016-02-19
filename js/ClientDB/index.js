@@ -22,7 +22,7 @@ class ClientDB {
                 .then(()=> this.jsonFile.create)
                 .then(()=> {
 
-                    this.store = new Datastore({ filename: this.jsonFile.path });
+                    this.store = new Datastore({ filename: this.jsonFile.path, autoload: true });
                     return resolve( this.msg.DATABASE_INIT );
 
                 })

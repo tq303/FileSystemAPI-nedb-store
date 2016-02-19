@@ -1,5 +1,6 @@
 /**
  * FileSystemAPI abstraction for convenient read / write / delete of files.
+ * Due to the async nature of the FileSystemAPI all related functions return a promise
  */
 
 class FileAPI {
