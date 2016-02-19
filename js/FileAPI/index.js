@@ -1,22 +1,40 @@
-class JSONFileAPI {
+/**
+ * FileSystemAPI abstraction for convenient read / write / delete of files.
+ */
 
-    constructor( fileName = "db.json", size = ( 1024*1024 ) ) {
+class FileAPI {
 
-        this.fs = null;
+    constructor( fileName = "db", fileType = "text/plain", size = ( 1024*1024 ) ) {
+
+        this.fs       = null;
         this.size     = size;
-        this.fileName = fileName;
-        this.fileType = "application/json";
-
-        window.webkitRequestFileSystem(window.PERSISTENT, this.size, ( fs )=> {
-
-            this.fs = fs;
-            this.create();
-
-        }, this.error );
+        this.fileType = fileType;
+        this.fileName = `${ fileName }.json`;
+        this.path     = `/${ fileName }.json`;
 
     }
 
-    create( data = [] ) {
+    // initialise required due to fileAPI async.
+    init() {
+        return new Promise((resolve, reject)=> {
+
+            window.webkitRequestFileSystem(window.PERSISTENT, this.size, ( fs )=> {
+
+                this.fs = fs;
+
+                this.create().then(( file )=> {
+
+                    return resolve( file );
+
+                });
+
+            }, reject );
+
+        });
+    }
+
+    // create a file, resolve promise even if file already existss
+    create() {
 
         return new Promise(( resolve, reject )=> {
 
@@ -24,19 +42,20 @@ class JSONFileAPI {
 
                 fileEntry.createWriter(( fileWriter )=> {
 
-                    let blob = new Blob([ JSON.stringify( data ) ], { type: this.fileType });
+                    let blob = new Blob([], { type: this.fileType });
 
-                    fileWriter.onerror = this.error;
+                    fileWriter.onerror    = reject;
                     fileWriter.onwriteend = resolve
 
-                }, this.error);
+                }, resolve);
 
-            }, this.error);
+            }, resolve);
 
         });
 
     }
 
+    // read file
     read() {
 
         return new Promise(( resolve, reject )=> {
@@ -47,21 +66,20 @@ class JSONFileAPI {
 
                     let reader = new FileReader();
 
-                    reader.onloadend = function( e ) {
-                        return resolve( this.result );
-                    };
+                    reader.onloadend = resolve( this.formatRead( this.result ) );
 
                     reader.readAsText( file );
 
-                }, this.error );
+                }, reject );
 
-            }, this.error);
+            }, reject);
 
         });
 
     }
 
-    write( data = [] ) {
+    // write file
+    write( data = "" ) {
 
         return new Promise(( resolve, reject )=> {
 
@@ -69,9 +87,9 @@ class JSONFileAPI {
 
                 fileEntry.createWriter(( fileWriter )=> {
 
-                    let blob = new Blob([ JSON.stringify( data ) ], { type: this.fileType });
+                    let blob = new Blob([ this.formatWrite( data ) ], { type: this.fileType });
 
-                    fileWriter.onerror = this.error;
+                    fileWriter.onerror = reject;
 
                     fileWriter.onwriteend = function( e ) {
 
@@ -89,13 +107,14 @@ class JSONFileAPI {
 
                     fileWriter.truncate(0);
 
-                }, this.error);
+                }, reject);
 
-            }, this.error);
+            }, reject);
 
         });
     }
 
+    // delete file
     delete() {
         return new Promise(( resolve, reject )=> {
 
@@ -106,21 +125,22 @@ class JSONFileAPI {
                     console.log(`${this.fileName} deleted.`);
                     return resolve();
 
-                }, this.error);
+                }, reject);
 
-            }, this.error);
+            }, reject);
 
         });
     }
 
-    error( e ) {
-        let error = {
-            error: e.name
-        };
-        console.error(error);
-        return Promise.resolve( error );
+    // override when extending
+    formatWrite( data ) {
+        return data;
+    }
+
+    formatRead( data ) {
+        return data;
     }
 
 }
 
-export default JSONFileAPI;
+export default FileAPI;

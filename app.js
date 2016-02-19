@@ -1,27 +1,36 @@
 require('./styles/main.scss');
 
-import JSONFileAPI from './js/JSONFileAPI';
+import ClientDB from './js/ClientDB';
 
-let jsonFile = new JSONFileAPI();
+let records = new ClientDB();
 
-window.setTimeout(()=> {
+records.init().then(( msg )=> {
 
-    let json = [
-        { amount: 0 },
-        { amount: 1 },
-        { amount: 2 },
-        { amount: 3 },
-        { amount: 4 },
-        { amount: 5 },
-        { amount: 6 },
-        { amount: 7 },
-        { amount: 8 }
-    ];
+    console.log( msg );
 
-    jsonFile.write( json )
-        .then(jsonFile.read.bind(jsonFile))
-        .then(( content )=> {
-            console.log(content);
-        });
+    records.load(( err, msg )=> {
 
-}, 500)
+        if (err !== null) {
+
+            throw err;
+
+        } else {
+
+            console.log( msg );
+
+            let doc = {
+                name: 'oliver'
+            };
+            records.store.insert(doc, function (err, newDoc) {
+                console.log(err, newDoc);
+            });
+
+            records.store.find({}, function (err, docs) {
+                console.log( docs );
+            });
+
+        }
+
+    });
+
+});
